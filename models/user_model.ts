@@ -11,7 +11,7 @@ export interface IUser extends Document {
     password: string;
     role: 'doctor' | 'nurse' | 'admin';
     phoneNumber?: string;
-    isVerified: boolean;
+    isVerified: boolean; 
     avatar: {
         public_id: string;
         url: string;

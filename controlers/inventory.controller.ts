@@ -18,7 +18,11 @@ export const getAllInventory = async (req: Request, res: Response, next: NextFun
 export const createInventory = async (req: Request, res: Response, next: NextFunction) => {
     const item = new InventoryItemModel({
         name: req.body.name,
-        quantity: req.body.quantity
+        quantity: req.body.quantity,
+        strength: req.body.strength,
+        dosageForm: req.body.dosageForm,
+        expiry_date: req.body.expiry_date,
+        prescription: req.body.prescription
     });
 
     try {
@@ -46,7 +50,18 @@ export const updateInventory = async (req: Request, res: Response, next: NextFun
         if (req.body.usageCount != null) {
             item.usageCount = req.body.usageCount;
         }
-
+        if (req.body.strength) {
+            item.strength = req.body.strength;
+        }
+        if (req.body.dosageForm) {
+            item.dosageForm = req.body.dosageForm;
+        }
+        if (req.body.expiry_date) {
+            item.expiry_date = req.body.expiry_date;
+        }
+        if (req.body.prescription) {
+            item.prescription = req.body.prescription;
+        }
         const updatedItem = await item.save();
         res.json(updatedItem);
     } catch (error) {

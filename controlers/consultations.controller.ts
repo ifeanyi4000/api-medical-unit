@@ -58,7 +58,7 @@ export const createConsultation = async (req: Request, res: Response, next: Next
         const newConsultation = await consultation.save();
         res.status(201).json(newConsultation);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: "Add missing fields" });
     }
 };
 

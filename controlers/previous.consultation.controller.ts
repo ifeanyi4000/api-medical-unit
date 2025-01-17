@@ -9,19 +9,54 @@ import returningConsultationModel, { IPreviousConsultation } from '../models/ret
 
 export const getPConsultation = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { previous_consultation_id } = req.params;
-    
-        const consultations = await returningConsultationModel.find({ previous_consultation_id }).sort({ date: -1 });
-    
+        const consultations = await previous.find({}, 'previous_consultation_id'); // Only retrieve the IDs
+        const consultationIds = consultations.map(consultation => consultation.previous_consultation_id);
+        res.json(consultationIds);
+    } catch (error) {
+        console.error("Error fetching consultation IDs:", error);
+        res.status(500).json({ error: 'Failed to fetch consultation IDs' });
+    }
+};
+
+
+
+export const getPConsultationByIdNew = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const consultations = await returningConsultationModel.find({ previous_consultation_id: req.params.id });
+        if (consultations.length === 0) {
+          return res.status(404).json({ message: 'No consultations found with the given ID' });
+        }
         res.json(consultations);
       } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server Error' });
+        res.status(500).json({ message: 'Error fetching consultations', error: error.message });
       }
 };
 
+
+export const getPConsultationByIdDetails = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+           const { id } = req.params;
+   
+           const consultation = await returningConsultationModel.findById(id)
+   
+           if (!consultation) {
+               return res.status(404).json({ message: 'Consultation not found' });
+           }
+   
+           res.status(200).json({
+               success: true,
+               consultation,
+           });
+       } catch (error) {
+           next(error);
+       }
+};
+
+
+
+
 export const getPConsultationById = async (req: Request, res: Response, next: NextFunction) => {
-    try { 
+    try {
         const { id } = req.params;
 
         const consultation = await returningConsultationModel.findById(id)
@@ -44,7 +79,7 @@ export const createPConsultation = async (req: Request, res: Response, next: Nex
         const consultationData: IPreviousConsultation = req.body;
 
         // Process conditions data
-        const processedConditions:any = {
+        const processedConditions: any = {
             highBloodPressure: processCondition(consultationData.conditions['High blood pressure']),
             heartDisease: processCondition(consultationData.conditions['Heart disease']),
             highCholesterol: processCondition(consultationData.conditions['High Cholesterol']),
